@@ -29,6 +29,5 @@
 
 ```bash
 git clone https://github.com/emiircane/Ustasindan-Web-Site.git
-cd ustasindan
 npm install
 npm run dev
