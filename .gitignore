@@ -1,0 +1,33 @@
+# node modules
+node_modules/
+.pnp/
+.pnp.js
+
+# build
+dist/
+build/
+
+# env files
+.env
+.env.*.local
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# system
+.DS_Store
+Thumbs.db
+
+# IDE/editor
+.vscode/
+.idea/
+*.swp
+
+# Tailwind JIT cache
+.tailwindcss
+
+# coverage
+coverage/
