@@ -13,6 +13,7 @@ import {
   Search,
   ArrowRight
 } from "lucide-react";
+import { supabase } from "../supabase";
 
 const isimListesi = [
   "Ahmet Yılmaz", "Mehmet Demir", "Ali Kaya", "Mustafa Çelik", "Hasan Şahin",
@@ -52,6 +53,30 @@ export default function AnaSayfa() {
   const [currentHizmetIndex, setCurrentHizmetIndex] = useState(0);
   const [isTyping, setIsTyping] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [kategoriler, setKategoriler] = useState([]);
+  const [loading, setLoading] = useState(true);
+  
+  // Veritabanından kategorileri çek
+  useEffect(() => {
+    async function fetchKategoriler() {
+      try {
+        const { data, error } = await supabase
+          .from('kategoriler')
+          .select('*')
+          .order('isim', { ascending: true });
+          
+        if (error) throw error;
+        
+        setKategoriler(data || []);
+      } catch (error) {
+        console.error('Kategoriler çekilirken hata oluştu:', error.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+    
+    fetchKategoriler();
+  }, []);
   
   // Yazı efekti için
   useEffect(() => {
@@ -130,6 +155,32 @@ export default function AnaSayfa() {
     if (searchQuery) {
       window.location.href = `/kategori/${encodeURIComponent(searchQuery)}`;
     }
+  };
+
+  // KATEGORİLER bölümünü güncelleyelim
+  const renderKategoriBolumu = () => {
+    if (loading) {
+      return (
+        <div className="flex justify-center items-center py-10">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+        {kategoriler.map((kategori) => (
+          <Link
+            key={kategori.id}
+            to={`/kategori/${encodeURIComponent(kategori.isim)}`}
+            className="bg-white hover:bg-orange-50 shadow-md hover:shadow-lg rounded-xl p-4 transition-all text-center transform hover:-translate-y-1 duration-300 flex flex-col items-center"
+          >
+            {kategoriIkon[kategori.isim] || <Zap className="mx-auto mb-2 text-orange-600" size={32} />}
+            <span className="text-gray-800 font-medium">{kategori.isim}</span>
+          </Link>
+        ))}
+      </div>
+    );
   };
 
   return (
@@ -221,49 +272,7 @@ export default function AnaSayfa() {
           </div>
           
           {/* Staggered grid layout */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8">
-            {["Elektrikçi", "Tesisatçı", "Boyacı", "Marangoz", "Temizlikçi", "Nakliyeci", "Çilingir", "Kombi Servisi"].map((kategori, index) => (
-              <Link
-                key={kategori}
-                to={`/kategori/${encodeURIComponent(kategori)}`}
-                className={`group bg-white/70 backdrop-blur-sm border border-gray-100 rounded-2xl shadow-lg hover:shadow-xl p-6 text-center cursor-pointer block transition-all duration-300 hover:-translate-y-1 hover:bg-white relative overflow-hidden ${
-                  index % 2 === 1 ? 'sm:translate-y-6 md:translate-y-0 lg:translate-y-6' : ''
-                } ${
-                  index % 4 === 2 ? 'md:translate-y-12 lg:translate-y-0' : ''
-                } ${
-                  index % 4 === 3 ? 'md:translate-y-6 lg:translate-y-12' : ''
-                }`}
-              >
-                <div className="absolute inset-0 bg-gradient-to-tr from-orange-100/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div className="relative z-10">
-                  <div className="mb-3 transform transition-transform duration-300 group-hover:scale-110 group-hover:text-orange-600">
-                    {kategoriIkon[kategori]}
-                  </div>
-                  <p className="text-lg font-semibold text-gray-800 group-hover:text-orange-600 transition-colors duration-300">{kategori}</p>
-                  <div className="mt-2 h-0.5 w-0 bg-orange-400 mx-auto transition-all duration-300 group-hover:w-12"></div>
-                  
-                  {/* Hover description - hidden by default, shown on hover */}
-                  <div className="opacity-0 max-h-0 group-hover:max-h-20 group-hover:opacity-100 transition-all duration-300 mt-3 text-sm text-gray-500 overflow-hidden">
-                    {
-                      {
-                        "Elektrikçi": "Elektrik tesisatı kurulum, bakım ve onarım işleriniz için",
-                        "Tesisatçı": "Su tesisatı, sıhhi tesisat montaj ve tamir",
-                        "Boyacı": "İç ve dış mekan boya, alçı, badana işleri",
-                        "Marangoz": "Ahşap mobilya, kapı, pencere imalat ve montaj",
-                        "Temizlikçi": "Ev, ofis temizliği ve detaylı temizlik hizmetleri",
-                        "Nakliyeci": "Ev, ofis taşıma ve her türlü nakliye işlemleri",
-                        "Çilingir": "Kapı kilit değişimi, çilingir ve anahtar yapımı",
-                        "Kombi Servisi": "Kombi bakım, onarım ve montaj hizmetleri"
-                      }[kategori]
-                    }
-                  </div>
-                </div>
-                
-                {/* Hover indicator */}
-                <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-orange-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </Link>
-            ))}
-          </div>
+          {renderKategoriBolumu()}
           
           <div className="flex justify-center mt-16">
             <Link to="/kategoriler" className="bg-white/80 backdrop-blur-sm hover:bg-white text-orange-600 hover:text-orange-700 font-medium py-2.5 px-6 rounded-full border border-orange-200 shadow-sm hover:shadow-md transition-all duration-300 flex items-center gap-2 group">
@@ -276,20 +285,20 @@ export default function AnaSayfa() {
 
       {/* HİZMET VERENLER - MODERNİZE EDİLMİŞ */}
       <section className="py-16 px-6 relative overflow-hidden">
-        {/* Solid background instead of gradient */}
-        <div className="absolute inset-0 -z-10 bg-white"></div>
+        {/* Softer background with very subtle pattern */}
+        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-white to-orange-50/30"></div>
         
-        {/* Decorative elements - same as other sections */}
-        <div className="absolute -bottom-24 right-0 w-96 h-96 bg-orange-200/10 rounded-full blur-3xl"></div>
-        <div className="absolute top-1/3 -left-24 w-80 h-80 bg-orange-200/10 rounded-full blur-3xl"></div>
+        {/* Decorative elements - softer and more subtle */}
+        <div className="absolute -bottom-24 right-0 w-96 h-96 bg-orange-100/20 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/3 -left-24 w-80 h-80 bg-orange-100/20 rounded-full blur-3xl"></div>
         
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col items-center mb-12">
-            <div className="bg-orange-100/80 backdrop-blur-sm px-4 py-1.5 rounded-full mb-3 shadow-sm">
-              <span className="text-orange-600 font-medium text-sm">Uzmanlarla Tanışın</span>
+            <div className="bg-orange-50 px-4 py-1.5 rounded-full mb-3 shadow-sm border border-orange-100/50">
+              <span className="text-orange-500 font-medium text-sm">Uzmanlarla Tanışın</span>
             </div>
             
-            <h3 className="text-3xl font-bold mb-2 text-center bg-clip-text text-transparent bg-gradient-to-r from-orange-600 to-orange-400">
+            <h3 className="text-3xl font-bold mb-2 text-center text-gray-700">
               Öne Çıkan Hizmet Verenler
             </h3>
             
@@ -297,7 +306,7 @@ export default function AnaSayfa() {
               Yüksek puanlı ve deneyimli uzmanlar işinizi profesyonelce yapar
             </p>
             
-            {/* Navigation controls for cards */}
+            {/* Navigation controls for cards - softer design */}
             <div className="flex items-center gap-3 mt-2">
               <button 
                 onClick={() => {
@@ -305,10 +314,10 @@ export default function AnaSayfa() {
                     sliderRef.current.scrollLeft -= 340;
                   }
                 }}
-                className="w-10 h-10 rounded-full bg-white border border-gray-200 shadow-md flex items-center justify-center hover:bg-orange-50 transition-all"
+                className="w-10 h-10 rounded-full bg-white border border-gray-100 shadow-sm flex items-center justify-center hover:bg-orange-50 transition-all"
                 aria-label="Önceki"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-orange-500">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-orange-400">
                   <path d="m15 18-6-6 6-6"/>
                 </svg>
               </button>
@@ -319,76 +328,76 @@ export default function AnaSayfa() {
                     sliderRef.current.scrollLeft += 340;
                   }
                 }}
-                className="w-10 h-10 rounded-full bg-white border border-gray-200 shadow-md flex items-center justify-center hover:bg-orange-50 transition-all"
+                className="w-10 h-10 rounded-full bg-white border border-gray-100 shadow-sm flex items-center justify-center hover:bg-orange-50 transition-all"
                 aria-label="Sonraki"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-orange-500">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-orange-400">
                   <path d="m9 18 6-6-6-6"/>
                 </svg>
               </button>
             </div>
           </div>
           
-          {/* Modern card showcase with 3D effects */}
+          {/* Softer card showcase with gentler effects */}
           <div className="relative">
-            {/* Scroll shadow indicators */}
-            <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none"></div>
-            <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none"></div>
+            {/* Scroll shadow indicators - more subtle */}
+            <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-orange-50/50 to-transparent z-10 pointer-events-none"></div>
+            <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-orange-50/50 to-transparent z-10 pointer-events-none"></div>
             
             {/* Cards container */}
             <div 
-              className="flex gap-8 pt-4 pb-8 px-2 overflow-x-scroll hide-scroll-bar scroll-smooth perspective-1000"
+              className="flex gap-8 pt-4 pb-8 px-2 overflow-x-scroll hide-scroll-bar scroll-smooth"
               ref={sliderRef}
             >
               {Array.from({ length: 15 }, (_, i) => i).map((index) => (
                 <Link
                   key={index}
                   to={`/detay/${index + 1}`}
-                  className="group min-w-[320px] relative transform transition-all duration-500 preserve-3d hover:rotate-y-3 hover:scale-[1.03] focus:rotate-y-3 focus:scale-[1.03]"
+                  className="group min-w-[320px] relative transform transition-all duration-500 hover:scale-[1.01] focus:scale-[1.01]"
                 >
-                  <div className="bg-white border border-gray-100 rounded-2xl shadow-lg overflow-hidden h-[420px] relative transition-all duration-300 group-hover:shadow-xl group-hover:border-orange-100">
-                    {/* Decorative top color bar */}
-                    <div className="h-1.5 w-full bg-gradient-to-r from-orange-500 to-yellow-400"></div>
+                  <div className="bg-white border border-gray-100 rounded-3xl shadow-sm overflow-hidden h-[420px] relative transition-all duration-300 group-hover:shadow-md group-hover:border-orange-100">
+                    {/* Softer top color bar */}
+                    <div className="h-1 w-full bg-orange-200"></div>
                     
-                    {/* Card background effect */}
-                    <div className="absolute inset-0 bg-gradient-to-b from-orange-50/0 via-orange-50/0 to-orange-50/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    {/* Card background effect - more subtle */}
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-orange-50/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     
                     {/* Profile section */}
                     <div className="flex flex-col items-center justify-center pt-8 pb-4 px-6 relative">
-                      {/* Circular profile image with more elegant glow */}
+                      {/* Circular profile image with softer glow */}
                       <div className="relative mb-5">
-                        <div className="absolute inset-0 bg-gradient-to-tr from-orange-300/50 to-yellow-200/50 rounded-full blur-md transform scale-90 opacity-0 group-hover:opacity-70 transition-all duration-300"></div>
+                        <div className="absolute inset-0 bg-gradient-to-tr from-orange-200/30 to-orange-100/30 rounded-full blur-md transform scale-90 opacity-0 group-hover:opacity-70 transition-all duration-300"></div>
                         <img
                           src={`https://randomuser.me/api/portraits/men/${index + 1}.jpg`}
                           alt={`Usta ${isimListesi[index]}`}
-                          className="w-28 h-28 object-cover rounded-full border-4 border-white shadow-md relative z-10 transition-all duration-300 group-hover:shadow-orange-100 group-hover:scale-105"
+                          className="w-28 h-28 object-cover rounded-full border-4 border-white shadow-sm relative z-10 transition-all duration-300 group-hover:shadow-orange-100"
                         />
                         
-                        {/* Online status indicator - more elegant */}
-                        <div className="absolute bottom-1 right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white z-20 flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
+                        {/* Online status indicator - softer */}
+                        <div className="absolute bottom-1 right-1 w-6 h-6 bg-green-400 rounded-full border-2 border-white z-20 flex items-center justify-center">
                           <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
                         </div>
                       </div>
                       
                       {/* Name and profession with better typography */}
-                      <h4 className="text-xl font-bold text-gray-800 group-hover:text-orange-600 transition-colors duration-300 mb-1">{isimListesi[index]}</h4>
+                      <h4 className="text-xl font-bold text-gray-700 group-hover:text-orange-500 transition-colors duration-300 mb-1">{isimListesi[index]}</h4>
                       <p className="text-gray-500 mb-3 tracking-wide">{["Elektrikçi", "Tesisatçı", "Boyacı", "Marangoz"][index % 4]}</p>
                       
                       {/* More elegant verification badge */}
-                      <div className="flex items-center gap-1.5 bg-green-100/80 border border-green-200 text-green-600 px-3 py-1 rounded-full text-xs font-medium mb-4 transition-all duration-300 group-hover:bg-green-600 group-hover:text-white group-hover:border-green-600">
+                      <div className="flex items-center gap-1.5 bg-green-50 border border-green-100 text-green-500 px-3 py-1 rounded-full text-xs font-medium mb-4 transition-all duration-300 group-hover:bg-green-100">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
                         <span>Kimliği Doğrulanmış</span>
                       </div>
                       
-                      {/* Rating stars with animation on hover */}
+                      {/* Rating stars - softer colors */}
                       <div className="flex items-center gap-1 mb-2">
                         {[...Array(5)].map((_, i) => (
                           <svg 
                             key={i} 
                             xmlns="http://www.w3.org/2000/svg" 
-                            className={`h-5 w-5 ${i < (index % 2 === 0 ? 5 : 4) ? 'text-yellow-400' : 'text-gray-300'} transition-transform duration-300 ${i === 0 ? 'group-hover:rotate-12 group-hover:scale-110' : i === 1 ? 'group-hover:rotate-6 group-hover:scale-105' : i === 2 ? 'group-hover:rotate-0' : i === 3 ? 'group-hover:-rotate-6 group-hover:scale-105' : 'group-hover:-rotate-12 group-hover:scale-110'}`}
+                            className={`h-5 w-5 ${i < (index % 2 === 0 ? 5 : 4) ? 'text-yellow-300' : 'text-gray-200'}`}
                             viewBox="0 0 20 20" 
                             fill="currentColor"
                           >
@@ -400,21 +409,21 @@ export default function AnaSayfa() {
                       
                       {/* Location with icon */}
                       <div className="flex items-center gap-1.5 text-gray-500 text-sm mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-orange-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
                         {["İstanbul", "Ankara", "İzmir", "Bursa"][index % 4]}
                       </div>
                       
-                      {/* Contact button */}
-                      <button className="w-full py-2.5 px-4 bg-white border border-orange-200 text-orange-600 rounded-lg text-sm font-medium transition-all duration-300 hover:bg-orange-500 hover:text-white hover:border-orange-500 group-hover:shadow-md">
+                      {/* Contact button - softer */}
+                      <button className="w-full py-2.5 px-4 bg-orange-50 text-orange-500 rounded-xl text-sm font-medium transition-all duration-300 hover:bg-orange-100 hover:text-orange-600 group-hover:shadow-sm">
                         İletişime Geç
                       </button>
                     </div>
                     
-                    {/* Availability badge with improved design */}
-                    <div className="absolute top-4 right-4 bg-gradient-to-r from-orange-500 to-yellow-500 text-white text-xs py-1.5 px-3 rounded-full shadow-md transform transition-all duration-300 group-hover:scale-105 group-hover:shadow-orange-300/50">
+                    {/* Availability badge with softer design */}
+                    <div className="absolute top-4 right-4 bg-orange-100 text-orange-500 text-xs py-1.5 px-3 rounded-full shadow-sm">
                       {["Acil İşler", "Aynı Gün", "Hafta Sonu", "7/24"][index % 4]}
                     </div>
                   </div>
@@ -423,7 +432,7 @@ export default function AnaSayfa() {
             </div>
           </div>
           
-          {/* Page indicators added back */}
+          {/* Page indicators - softer design */}
           <div className="flex justify-center gap-2 mt-4">
             {[...Array(5)].map((_, i) => (
               <button 
@@ -435,7 +444,7 @@ export default function AnaSayfa() {
                   }
                 }}
                 className={`h-2 rounded-full transition-all duration-300 ${
-                  i === 0 ? 'w-8 bg-orange-500' : 'w-2 bg-gray-300 hover:bg-orange-300'
+                  i === 0 ? 'w-8 bg-orange-300' : 'w-2 bg-gray-200 hover:bg-orange-200'
                 }`}
                 aria-label={`Sayfa ${i + 1}`}
               />
@@ -445,7 +454,7 @@ export default function AnaSayfa() {
           <div className="flex justify-center mt-10">
             <Link 
               to="/hizmet-verenler" 
-              className="bg-white hover:bg-orange-50 text-orange-600 hover:text-orange-700 font-medium py-2.5 px-6 rounded-full border border-orange-200 shadow-sm hover:shadow-md transition-all duration-300 flex items-center gap-2 group"
+              className="bg-orange-50 hover:bg-orange-100 text-orange-500 hover:text-orange-600 font-medium py-2.5 px-6 rounded-full border border-orange-100 shadow-sm transition-all duration-300 flex items-center gap-2 group"
             >
               <span>Tüm Hizmet Verenleri Görüntüle</span>
               <ArrowRight className="transition-transform duration-300 group-hover:translate-x-1" size={18} />

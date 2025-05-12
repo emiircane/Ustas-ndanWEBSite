@@ -4,13 +4,18 @@ import AnaSayfa from "./pages/AnaSayfa";
 import DetaySayfasi from "./pages/DetaySayfasi";
 import AyarlarSayfasi from "./pages/AyarlarSayfasi";
 import KategoriSonucSayfasi from "./pages/KategoriSonucSayfasi";
-import ProfilSayfasi from "./pages/ProfilSayfasi";
+import IlanlarimSayfasi from "./pages/IlanlarimSayfasi";
+import GirisSayfasi from "./pages/GirisSayfasi";
+import KayitOlSayfasi from "./pages/KayitOlSayfasi";
+import IlanOlustur from "./pages/IlanOlustur";
 import { Plus, Menu, X, Settings, LogOut, Home, Wrench, Bell, TrendingUp, Award } from "lucide-react"; // Modern ikonlar için
+import { supabase } from "./supabase";
 
 function App() {
   const [menuAcik, setMenuAcik] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [kullanici, setKullanici] = useState(null);
   const menuRef = useRef();
 
   // İstatistik verileri
@@ -18,6 +23,20 @@ function App() {
     { icon: <TrendingUp size={18} />, title: "Toplam Hizmet", value: "1,250+" },
     { icon: <Award size={18} />, title: "Memnun Müşteri", value: "10,000+" }
   ];
+
+  // Kullanıcı bilgisini localStorage'dan al
+  useEffect(() => {
+    const veri = localStorage.getItem("kullanici");
+    if (veri) {
+      try {
+        const kullaniciData = JSON.parse(veri);
+        setKullanici(kullaniciData);
+      } catch (error) {
+        console.error("Kullanıcı verisi işlenirken hata oluştu:", error);
+        localStorage.removeItem("kullanici");
+      }
+    }
+  }, []);
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -48,6 +67,21 @@ function App() {
     document.documentElement.classList.remove("dark");
     localStorage.removeItem('darkMode');
   }, []);
+
+  // Kullanıcı çıkış fonksiyonu
+  const handleLogout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
+      localStorage.removeItem("kullanici");
+      setKullanici(null);
+      setMenuAcik(false);
+      window.location.href = "/";
+    } catch (error) {
+      console.error("Çıkış yaparken hata oluştu:", error.message);
+    }
+  };
 
   return (
     <Router>
@@ -119,57 +153,69 @@ function App() {
                 
                 {/* Create post button */}
                 <Link
-                  to="/"
+                  to="/ilan-olustur"
                   className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:shadow-orange-400/20 transition-all duration-200 transform hover:-translate-y-0.5"
                 >
                   <Plus size={20} className="animate-pulse" /> İlan Oluştur
                 </Link>
                 
                 {/* Notifications button (hidden when not logged in) */}
-                <button className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors relative">
-                  <Bell size={20} />
-                  <span className="absolute top-0 right-0 bg-red-500 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center">3</span>
-                </button>
+                {kullanici && (
+                  <button className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors relative">
+                    <Bell size={20} />
+                    <span className="absolute top-0 right-0 bg-red-500 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center">3</span>
+                  </button>
+                )}
                 
                 {/* User menu */}
-                <div className="relative" ref={menuRef}>
-                  <button
-                    className="flex items-center space-x-1 p-1 rounded-full border border-gray-200 hover:bg-gray-100 transition-colors"
-                    onClick={() => setMenuAcik(!menuAcik)}
+                {kullanici ? (
+                  <div className="relative" ref={menuRef}>
+                    <button
+                      className="flex items-center space-x-1 p-1 rounded-full border border-gray-200 hover:bg-gray-100 transition-colors"
+                      onClick={() => setMenuAcik(!menuAcik)}
+                    >
+                      <img
+                        src="https://www.svgrepo.com/show/384674/account-avatar-profile-user-11.svg"
+                        alt="profil"
+                        className="w-8 h-8 rounded-full object-cover"
+                      />
+                      <span className="hidden md:block text-sm font-medium">Profil</span>
+                    </button>
+                    
+                    {menuAcik && (
+                      <div className="absolute right-0 mt-2 w-56 rounded-xl bg-white border border-gray-100 shadow-lg overflow-hidden z-50 transform transition-all duration-200 origin-top-right">
+                        <div className="px-4 py-3 border-b border-gray-100">
+                          <p className="text-sm text-gray-500">Hoş geldiniz</p>
+                          <p className="text-sm font-semibold">{kullanici.ad || "Kullanıcı"}</p>
+                        </div>
+                        <div className="py-1">
+                          <Link to="/ayarlar" className="flex items-center px-4 py-2 text-sm hover:bg-orange-50 text-gray-700">
+                            <Settings size={16} className="mr-2" />
+                            Profili Düzenle
+                          </Link>
+                          <Link to="/ilanlar" className="flex items-center px-4 py-2 text-sm hover:bg-orange-50 text-gray-700">
+                            <Wrench size={16} className="mr-2" />
+                            İlanlarım
+                          </Link>
+                          <button 
+                            className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                            onClick={handleLogout}
+                          >
+                            <LogOut size={16} className="mr-2" />
+                            Çıkış Yap
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <Link
+                    to="/giris"
+                    className="flex items-center space-x-1 p-1 px-3 rounded-full border border-orange-200 bg-orange-50 hover:bg-orange-100 transition-colors"
                   >
-                    <img
-                      src="https://www.svgrepo.com/show/384674/account-avatar-profile-user-11.svg"
-                      alt="profil"
-                      className="w-8 h-8 rounded-full object-cover"
-                    />
-                    <span className="hidden md:block text-sm font-medium">Profil</span>
-                  </button>
-                  
-                  {menuAcik && (
-                    <div className="absolute right-0 mt-2 w-56 rounded-xl bg-white border border-gray-100 shadow-lg overflow-hidden z-50 transform transition-all duration-200 origin-top-right">
-                      <div className="px-4 py-3 border-b border-gray-100">
-                        <p className="text-sm text-gray-500">Hoş geldiniz</p>
-                        <p className="text-sm font-semibold">Profili Düzenle</p>
-                      </div>
-                      <div className="py-1">
-                        <Link to="/ayarlar" className="flex items-center px-4 py-2 text-sm hover:bg-orange-50 text-gray-700">
-                          <Settings size={16} className="mr-2" />
-                          Profili Düzenle
-                        </Link>
-                        <Link to="/profil" className="flex items-center px-4 py-2 text-sm hover:bg-orange-50 text-gray-700">
-                          <Wrench size={16} className="mr-2" />
-                          İlanlarım
-                        </Link>
-                        <button 
-                          className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                        >
-                          <LogOut size={16} className="mr-2" />
-                          Çıkış Yap
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
+                    <span className="text-sm font-medium text-orange-600">Giriş Yap</span>
+                  </Link>
+                )}
               </div>
             </nav>
           </div>
@@ -177,10 +223,13 @@ function App() {
 
         <Routes>
           <Route path="/" element={<AnaSayfa />} />
-          <Route path="/detay/:id" element={<DetaySayfasi />} />
-          <Route path="/kategori/:isim" element={<KategoriSonucSayfasi />} />
+          <Route path="/giris" element={<GirisSayfasi />} />
+          <Route path="/kayit" element={<KayitOlSayfasi />} />
+          <Route path="/ilan/:id" element={<DetaySayfasi />} />
+          <Route path="/ilanlar" element={<IlanlarimSayfasi />} />
           <Route path="/ayarlar" element={<AyarlarSayfasi />} />
-          <Route path="/profil" element={<ProfilSayfasi />} />
+          <Route path="/kategori/:kategori" element={<KategoriSonucSayfasi />} />
+          <Route path="/ilan-olustur" element={<IlanOlustur />} />
         </Routes>
       </div>
     </Router>

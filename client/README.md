@@ -17,6 +17,7 @@
 - **React Router**
 - **Tailwind CSS**
 - **Lucide React**
+- **Supabase**
 - `useState`, `useParams` gibi modern React hook'ları
 
 ## 🖼️ Sayfa Yapısı
@@ -30,4 +31,17 @@
 ```bash
 git clone https://github.com/emiircane/Ustasindan-Web-Site.git
 npm install
+```
+
+### Çevre Değişkenleri
+
+1. `client` klasöründe `.env` adında bir dosya oluşturun
+2. Aşağıdaki değişkenleri ekleyin:
+```
+VITE_SUPABASE_URL=https://your-supabase-project-url.supabase.co
+VITE_SUPABASE_KEY=your-supabase-anon-key
+```
+3. Supabase proje bilgilerinizi bu dosyaya ekleyin
+
+```bash
 npm run dev

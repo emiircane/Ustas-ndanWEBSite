@@ -7,7 +7,25 @@
 
 ## 📋 Proje Hakkında
 
-**Ustasından**, hizmet veren profesyoneller ile hizmet almak isteyen kullanıcıları buluşturan modern bir web platformudur. Glass morphism tasarım öğeleri, akıcı animasyonlar ve kullanıcı dostu arayüz ile öne çıkar.
+**Ustasından**, çevrendeki güvenilir hizmet verenleri kolayca bulmanı sağlayan modern bir web uygulamasıdır. Elektrikçiden çilingire, tesisatçıdan temizlikçiye kadar birçok kategoride ustalara ulaşmanı sağlar.
+
+## 📁 Proje Yapısı
+
+Proje iki ana kısımdan oluşur:
+- **client/** - React bazlı ön yüz uygulaması
+- **server/** - Veritabanı kurulum dosyaları
+
+## 🔒 Çevre Değişkenleri Kurulumu
+
+GitHub'a yüklemeden önce aşağıdaki adımları izleyin:
+
+1. `client` klasöründe `.env` adında bir dosya oluşturun
+2. Aşağıdaki değişkenleri ekleyin:
+```
+VITE_SUPABASE_URL=https://your-supabase-project-url.supabase.co
+VITE_SUPABASE_KEY=your-supabase-anon-key
+```
+3. Supabase proje bilgilerinizi bu dosyaya ekleyin
 
 ## ✨ Tasarım Özellikleri
 
@@ -24,6 +42,7 @@
 - **Tailwind CSS** - Utility-first CSS framework
 - **Lucide React** - Yüksek kaliteli ikonlar
 - **React Router v6** - Sayfa yönlendirmeleri
+- **Supabase** - Veritabanı ve kimlik doğrulama
 
 ## 💻 Kurulum
 
