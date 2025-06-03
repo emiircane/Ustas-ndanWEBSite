@@ -1,23 +1,39 @@
-# 🛠️ Ustasından - Hizmet Verenler Platformu
-
-<div align="center">
-  <img src="client/src/assets/screenshot.png" alt="Ustasından Platform Screenshot" width="600"/>
-  <p><em>Modern ve kullanıcı dostu bir hizmet bulma platformu</em></p>
-</div>
-
-## 📋 Proje Hakkında
+# Ustasından – Hizmet Veren Platformu
 
 **Ustasından**, çevrendeki güvenilir hizmet verenleri kolayca bulmanı sağlayan modern bir web uygulamasıdır. Elektrikçiden çilingire, tesisatçıdan temizlikçiye kadar birçok kategoride ustalara ulaşmanı sağlar.
 
-## 📁 Proje Yapısı
+## 🚀 Özellikler
 
-Proje iki ana kısımdan oluşur:
-- **client/** - React bazlı ön yüz uygulaması
-- **server/** - Veritabanı kurulum dosyaları
+- 🔍 Popüler hizmet kategorileri listesi
+- 🧑‍🔧 Detaylı ustaları listeleme sayfası
+- 🧰 Gelişmiş filtreleme: il, deneyim, hizmet türü, ustalık belgesi
+- 🎨 Modern, responsive ve animasyonlu kullanıcı arayüzü
+- 💬 Usta puanları ve değerlendirme ekranı (dummy verilerle)
+- ⚡ Kategori ikonları: `lucide-react` ile estetik ve sade
 
-## 🔒 Çevre Değişkenleri Kurulumu
+## 🛠️ Kullanılan Teknolojiler
 
-GitHub'a yüklemeden önce aşağıdaki adımları izleyin:
+- **React**
+- **React Router**
+- **Tailwind CSS**
+- **Lucide React**
+- **Supabase**
+- `useState`, `useParams` gibi modern React hook'ları
+
+## 🖼️ Sayfa Yapısı
+
+- `/` – Ana Sayfa (kategori seçimi, öne çıkan ustalar)
+- `/kategori/:isim` – Seçilen kategoriye göre usta listesi
+- `/giris`, `/kayit`, `/ayarlar` – Kullanıcı sistemine giriş-çıkış bölümleri
+
+## ⚙️ Kurulum
+
+```bash
+git clone https://github.com/emiircane/Ustasindan-Web-Site.git
+npm install
+```
+
+### Çevre Değişkenleri
 
 1. `client` klasöründe `.env` adında bir dosya oluşturun
 2. Aşağıdaki değişkenleri ekleyin:
@@ -27,132 +43,5 @@ VITE_SUPABASE_KEY=your-supabase-anon-key
 ```
 3. Supabase proje bilgilerinizi bu dosyaya ekleyin
 
-## ✨ Tasarım Özellikleri
-
-- **Glass Morphism Efektleri:** Saydam, buzlu cam görünümlü kartlar ve bileşenler
-- **3D Dönüşümler:** Hover efektlerinde derinlik hissi yaratan 3D dönüşümler
-- **Gradient Renk Geçişleri:** Marka kimliğini yansıtan turuncu tonlarında gradient kullanımı
-- **Mikro Etkileşimler:** Butonlarda ve kartlarda kullanıcı etkileşimini zenginleştiren animasyonlar
-- **Responsive Tasarım:** Tüm cihaz boyutlarına uyumlu, mobil öncelikli yaklaşım
-
-## 🚀 Teknolojiler
-
-- **React 18** - Modern UI kütüphanesi
-- **Vite** - Hızlı geliştirme deneyimi
-- **Tailwind CSS** - Utility-first CSS framework
-- **Lucide React** - Yüksek kaliteli ikonlar
-- **React Router v6** - Sayfa yönlendirmeleri
-- **Supabase** - Veritabanı ve kimlik doğrulama
-
-## 💻 Kurulum
-
-### Gereksinimler
-
-- Node.js (v16+)
-- npm veya yarn
-
-### Adımlar
-
-1. Projeyi klonlayın:
-   ```bash
-   git clone https://github.com/username/ustasindan.git
-   cd ustasindan
-   ```
-
-2. Bağımlılıkları yükleyin:
-   ```bash
-   cd client
-   npm install
-   ```
-
-3. Uygulamayı başlatın:
-   ```bash
-   npm run dev
-   ```
-
-4. Tarayıcınızda açın:
-   ```
-   http://localhost:5173
-   ```
-
-## 🌟 Özellikler
-
-### Ana Sayfa
-- **Hero Bölümü:** Dikkat çekici başlık ve CTA butonu
-- **Popüler Kategoriler:** Öne çıkan hizmet kategorileri
-- **Öne Çıkan Hizmet Verenler:** 3D dönüşüm efektli kartlar
-- **200+ Uzman Usta Badge:** Profesyonellerin sayısını vurgulayan rozet
-- **Kullanıcı Yorumları:** Memnun müşteri görüşleri
-
-### Kategori Sayfaları
-- **Filtreleme Seçenekleri:** Hizmetleri çeşitli kriterlere göre filtreleme
-- **Liste/Grid Görünümü:** Farklı görüntüleme seçenekleri
-- **Lazy Loading:** Performans için kademeli yükleme
-
-### İlan Detay Sayfası
-- **Galeri Görünümü:** Hizmetle ilgili görseller
-- **Detaylı Bilgiler:** Hizmet kapsamı, fiyatlandırma, konum
-- **İletişim Seçenekleri:** Hizmet verenle doğrudan iletişim
-
-### Yenilenen Footer Bölümü
-- **Kategoriler Navigasyonu:** Hızlı erişim linkleri
-- **İletişim Bilgileri:** Platform iletişim detayları
-- **Yasal Bağlantılar:** Gizlilik politikası, kullanım şartları
-
-## 📂 Proje Yapısı
-
-```
-/
-└── client/                 # Frontend kodları
-    ├── public/             # Statik dosyalar
-    ├── src/                # Kaynak kodları
-    │   ├── components/     # Yeniden kullanılabilir bileşenler
-    │   │   ├── ui/         # Temel UI bileşenleri
-    │   │   ├── layout/     # Sayfa düzeni bileşenleri
-    │   │   └── cards/      # Kart bileşenleri
-    │   ├── pages/          # Sayfa bileşenleri
-    │   ├── assets/         # Görseller ve statik varlıklar
-    │   ├── App.jsx         # Ana uygulama bileşeni
-    │   └── main.jsx        # Giriş noktası
-    ├── index.html          # HTML şablonu
-    └── package.json        # Bağımlılıklar
-```
-
-## 📱 Responsive Tasarım
-
-- **Mobil:** 320px - 767px
-- **Tablet:** 768px - 1023px
-- **Masaüstü:** 1024px ve üzeri
-- **Geniş Ekran:** 1440px ve üzeri
-
-## 🎨 Renk Paleti
-
-- **Ana Renk:** #FF7A00 (Turuncu)
-- **İkincil Renk:** #FFB800 (Amber)
-- **Arka Plan:** #FFF7ED (Krem)
-- **Metin (Koyu):** #1F2937
-- **Metin (Açık):** #6B7280
-
-## 🔍 Yapılan Son Değişiklikler
-
-- **Glass Morphism Efektleri:** Popüler kategoriler ve öne çıkan hizmet verenler bölümlerine eklendi
-- **Animasyonlar Geliştirildi:** Sayfa geçişleri ve hover efektleri iyileştirildi
-- **"200+ Uzman Usta" Badge:** Daha sade ve modern bir tasarıma güncellendi
-- **Arka Plan Renkleri:** Tüm bölümlerde tutarlı hale getirildi
-- **Hizmet Veren Kartları:** 3D transformasyon ve hover efektleri eklendi
-- **Footer Yenilendi:** Navigasyon, iletişim ve yasal linkler eklendi
-
-## 📜 Lisans
-
-Bu proje MIT lisansı altında lisanslanmıştır.
-
----
-
-<div align="center">
-  <p>
-    <a href="https://github.com/username/ustasindan">
-      <img src="https://img.shields.io/badge/GitHub-Proje%20Sayfası-blue?style=for-the-badge&logo=github" alt="GitHub" />
-    </a>
-  </p>
-  <p>Ustasından © 2023</p>
-</div> 
+```bash
+npm run dev
